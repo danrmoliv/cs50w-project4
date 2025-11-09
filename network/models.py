@@ -20,6 +20,10 @@ class PostItem(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     liked_by = models.ManyToManyField(User, blank=True, related_name="posts_liked")
 
+    def __str__(self):
+        return f"{self.user} - Post: {self.body} - {self.timestamp}"
+    
+
     def serialize(self):
         return {
             "id": self.id,

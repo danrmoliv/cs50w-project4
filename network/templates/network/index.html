@@ -1,5 +1,28 @@
 {% extends "network/layout.html" %}
+{% load static %}
 
 {% block body %}
-    TODO
+    <div id="all-posts-view">
+        <h2>All Posts</h2>
+        {% if user.is_authenticated %}
+            <div id="new-post">
+
+                <h3>New Post</h3>
+
+                <form id="compose-post">    
+                    {% csrf_token %}
+                    <textarea class="form-control" id="post-body" placeholder=""></textarea>
+                    <input type="submit" value="Post" class="btn btn-primary"/>
+                </form>
+
+            </div>
+        {% endif %}
+    </div> 
+
+    <div id="following-view">
+        TODO
+    </div>
+
+    
 {% endblock %}
+
