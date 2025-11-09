@@ -37,6 +37,15 @@ def compose_post(request):
 
     return JsonResponse({"message": "Post sent successfully."}, status=201)
 
+def return_posts(request, user_posts):
+    
+    if user_posts=='all':
+        posts = PostItem.objects.all()
+
+        posts = posts.order_by("-timestamp").all()
+
+        return JsonResponse([postitem.serialize() for postitem in posts], safe=False)
+
 
 def login_view(request):
     if request.method == "POST":

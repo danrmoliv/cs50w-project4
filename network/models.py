@@ -30,5 +30,5 @@ class PostItem(models.Model):
             "creator": self.user.username,
             "body": self.body,
             "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
-            "liked_by": self.liked_by
+            "liked_by": [user.username for user in self.liked_by.all()],
         }
