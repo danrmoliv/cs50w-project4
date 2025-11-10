@@ -35,6 +35,8 @@ function load_profile_user(username){
   document.querySelector('#all-posts-view').style.display = 'none';
   document.querySelector('#profile-view').style.display = 'block';
 
+  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
   const divProfile = document.querySelector("#profile-content");
 
   fetch(`/profiles/${username}`)
@@ -78,7 +80,49 @@ function load_profile_user(username){
         } else {
           followButton.style.display = 'block';
         };        
-      }
+      };
+
+      followButton.addEventListener('click', () => {
+        // alert(`followClicked ${username}`);
+
+        fetch(`/profiles/${username}`, {
+        method: 'PUT',
+        headers: {
+          // Informa ao servidor que você está enviando JSON
+          'Content-Type': 'application/json',
+          // Adiciona o token CSRF ao cabeçalho que o Django espera
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            follow: true,
+            currentUser: currentUsername
+        })
+        })
+        .then(fetch(`/profiles/${username}`)).then(followButton.style.display = 'none')
+        .then(unfollowButton.style.display = 'block');
+
+      });
+
+      unfollowButton.addEventListener('click', () => {
+        // alert(`unfollowClicked ${username}`)
+
+        fetch(`/profiles/${username}`, {
+        method: 'PUT',
+        headers: {
+          // Informa ao servidor que você está enviando JSON
+          'Content-Type': 'application/json',
+          // Adiciona o token CSRF ao cabeçalho que o Django espera
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            unfollow: true,
+            currentUser: currentUsername
+        })
+        })
+        .then(fetch(`/profiles/${username}`)).then(unfollowButton.style.display = 'none')
+        .then(followButton.style.display = 'block');;
+      });
+
 
     })
   })

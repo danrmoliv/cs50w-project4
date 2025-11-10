@@ -4,8 +4,11 @@ from django.db import models
 ### TODO: Verificar como modelar following
 
 class User(AbstractUser):
-    following = models.ManyToManyField('self', related_name='following')
-    followers = models.ManyToManyField('self', related_name='followers') 
+    following = models.ManyToManyField('self', related_name='following', blank=True)
+    followers = models.ManyToManyField('self', related_name='followers', blank=True)
+
+    def __str__(self):
+        return f"{self.username} - following: {[user.username for user in self.following.all()]} - followers: {[user.username for user in self.followers.all()]}"
 
     def serialize(self):
         return {

@@ -59,12 +59,37 @@ def return_posts(request, user_posts):
     return JsonResponse([postitem.serialize() for postitem in posts], safe=False)
 
 def return_profile_content(request, user_name):
-    print(User.objects.filter(username=user_name))
-    try:
-        usuarios = User.objects.filter(username=user_name)
-        return JsonResponse([usuario.serialize() for usuario in usuarios], safe=False)
-    except:
-        return JsonResponse({"error": "Invalid User."}, status=400)
+    
+    if request.method == "GET":
+        try:
+            usuarios = User.objects.filter(username=user_name)
+            return JsonResponse([usuario.serialize() for usuario in usuarios], safe=False)
+        except:
+            return JsonResponse({"error": "Invalid User."}, status=400)
+    elif request.method == "PUT":
+        data = json.loads(request.body)
+
+        usuario = User.objects.get(username=user_name)
+        usuario_request = User.objects.get(username=data.get("currentUser"))
+
+        if data.get("follow"):
+ 
+            usuario.followers.add(usuario_request)
+            usuario_request.following.add(usuario)
+
+            usuario.save()
+            usuario_request.save()   
+            
+        elif data.get("unfollow"):
+ 
+            usuario.followers.remove(usuario_request)
+            usuario_request.following.remove(usuario)
+
+            usuario.save()
+            usuario_request.save()   
+
+        return HttpResponse(status=204)
+
 
 
 
