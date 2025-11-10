@@ -48,6 +48,7 @@
     </body>
 
     {% block script %}
+        <script> const currentUsername = "{{ request.user.username }}"; </script>
         <script src="{% static 'network/scriptIndex.js' %}"></script>
     {% endblock %}
 </html>

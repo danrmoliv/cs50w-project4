@@ -9,6 +9,13 @@ h2{
     border-radius: 5px;
 }
 
+#profile-content{
+    margin: 15px;
+    border: solid #c8cbce 1px;
+    padding: 20px;
+    border-radius: 5px;
+}
+
 .post-item {
     margin: 15px;
     border: solid #c8cbce 1px;

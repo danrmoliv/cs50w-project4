@@ -24,21 +24,78 @@ function load_all_posts() {
 
     document.querySelector('#all-posts-view').style.display = 'block';
     document.querySelector('#following-view').style.display = 'none';
+    document.querySelector('#profile-view').style.display = 'none';
 
     createAllPostsView();
     // composePost();
 };
 
-function load_following() {
-    document.querySelector('#all-posts-view').style.display = 'none';
-    document.querySelector('#following-view').style.display = 'block';
+function load_profile_user(username){
+  document.querySelector('#following-view').style.display = 'none';
+  document.querySelector('#all-posts-view').style.display = 'none';
+  document.querySelector('#profile-view').style.display = 'block';
+
+  const divProfile = document.querySelector("#profile-content");
+
+  fetch(`/profiles/${username}`)
+  .then(response => response.json())
+  .then(usuarios => {
+    usuarios.forEach(usuario => {
+
+      const username = usuario.username;
+
+      const followers = usuario.followers;
+      const followersQtd = followers.length;
+
+      const following = usuario.followers;
+      const followingQtd = following.length;
+
+      divProfile.innerHTML = `
+        <h3>${username}</h3>
+        <h5>${followersQtd} Followers      ${followingQtd} Following</h5>`
+
+      // console.log(username, followersQtd, followingQtd)
+
+      const followButton = document.createElement('button');
+      followButton.className = "btn btn-sm btn-outline-primary";
+      followButton.id = "follow-btn";
+      followButton.textContent = 'Follow';
+      followButton.style.display = 'none';
+
+      divProfile.appendChild(followButton);
+
+      const unfollowButton = document.createElement('button');
+      unfollowButton.className = "btn btn-sm btn-outline-primary";
+      unfollowButton.id = "follow-btn";
+      unfollowButton.textContent = 'Unfollow';
+      unfollowButton.style.display = 'none';
+
+      divProfile.appendChild(unfollowButton);
+
+      if (currentUsername !== username) {
+        if (followers.includes(currentUsername)){
+          unfollowButton.style.display = 'block';
+        } else {
+          followButton.style.display = 'block';
+        };        
+      }
+
+    })
+  })
+  .then(createPostsCards(username, document.querySelector('#profile-posts')))
 };
 
-function createAllPostsView() {
-  divPostsView = document.querySelector("#div-all-posts");
-  divPostsView.innerHTML = '';
+function load_following(profile) {
+    document.querySelector('#all-posts-view').style.display = 'none';
+    document.querySelector('#following-view').style.display = 'block';
+    document.querySelector('#profile-view').style.display = 'none';
 
-  fetch(`/posts/all`)
+    // load_profile_user('foo');
+
+};
+
+function createPostsCards(profile, divPostsView){
+  fetch(`/posts/${profile}`)
   .then(response => response.json())
   .then(postItems => {
 
@@ -54,8 +111,12 @@ function createAllPostsView() {
       elementPost.id = `post-id-${postItem.id}`;
 
       const titlePostElement = document.createElement('h4');
-      titlePostElement.textContent = userWhoPosted;
+      titlePostElement.innerHTML = `<a href="#">${userWhoPosted}</a>`;
       elementPost.appendChild(titlePostElement);
+
+      titlePostElement.addEventListener('click', () => {
+        load_profile_user(userWhoPosted);
+      });
 
       // const editAnchorElement = document.createElement('p');
       // // editAnchorElement.href
@@ -84,14 +145,19 @@ function createAllPostsView() {
       // likesEmojiElement.style.color = 'red'
       // likesEmojiElement.style.fontSize = '32px'
       
-      divPostsView.appendChild(elementPost);
-
-      console.log(body, userWhoPosted, horario, qtdLikes)
-      
+      divPostsView.appendChild(elementPost);      
       
     })
   })
 }
+
+function createAllPostsView() {
+  divPostsView = document.querySelector("#div-all-posts");
+  divPostsView.innerHTML = '';
+
+  createPostsCards('all', divPostsView);
+  
+};
 
 function composePost() {
   formDOM = document.querySelector("#compose-post");

@@ -38,13 +38,34 @@ def compose_post(request):
     return JsonResponse({"message": "Post sent successfully."}, status=201)
 
 def return_posts(request, user_posts):
-    
+
     if user_posts=='all':
         posts = PostItem.objects.all()
 
-        posts = posts.order_by("-timestamp").all()
+    elif len(user_posts) > 0:
+        try:
+            user_id = User.objects.filter(username=user_posts)[0].id
+            posts = PostItem.objects.filter(
+                user=user_id
+            )       
+        except:
+            return JsonResponse({"error": "Invalid User."}, status=400)
+    else:
+        return JsonResponse({"error": "Invalid User."}, status=400)
 
-        return JsonResponse([postitem.serialize() for postitem in posts], safe=False)
+
+    posts = posts.order_by("-timestamp").all()
+
+    return JsonResponse([postitem.serialize() for postitem in posts], safe=False)
+
+def return_profile_content(request, user_name):
+    print(User.objects.filter(username=user_name))
+    try:
+        usuarios = User.objects.filter(username=user_name)
+        return JsonResponse([usuario.serialize() for usuario in usuarios], safe=False)
+    except:
+        return JsonResponse({"error": "Invalid User."}, status=400)
+
 
 
 def login_view(request):
