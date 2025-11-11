@@ -101,6 +101,9 @@ function load_profile_user(username){
         .then(fetch(`/profiles/${username}`)).then(followButton.style.display = 'none')
         .then(unfollowButton.style.display = 'block');
 
+            ////// TODO: Corrigir bug na alteração automatica da quantidade de seguidores
+
+
       });
 
       unfollowButton.addEventListener('click', () => {
@@ -120,26 +123,32 @@ function load_profile_user(username){
         })
         })
         .then(fetch(`/profiles/${username}`)).then(unfollowButton.style.display = 'none')
-        .then(followButton.style.display = 'block');;
+        .then(followButton.style.display = 'block').then(fetch(`/posts/following`));
       });
 
-
+      /// TODO: Corrigir bug unfollow na pagina following
     })
   })
   .then(createPostsCards(username, document.querySelector('#profile-posts')))
 };
 
-function load_following(profile) {
+function load_following() {
     document.querySelector('#all-posts-view').style.display = 'none';
     document.querySelector('#following-view').style.display = 'block';
     document.querySelector('#profile-view').style.display = 'none';
 
+    divPostsFollowing = document.querySelector("#following-view");
+
+    const page = 1
+
     // load_profile_user('foo');
+    fetch(`/posts/following`)
+    .then(createPostsCards('following', divPostsFollowing, page));
 
 };
 
-function createPostsCards(profile, divPostsView){
-  fetch(`/posts/${profile}`)
+function createPostsCards(profile, divPostsView, page=1){
+  fetch(`/posts/${profile}?page=${page}`)
   .then(response => response.json())
   .then(postItems => {
 
@@ -199,7 +208,29 @@ function createAllPostsView() {
   divPostsView = document.querySelector("#div-all-posts");
   divPostsView.innerHTML = '';
 
-  createPostsCards('all', divPostsView);
+  let page = 1
+
+  nextBtn = document.querySelector("#next-btn")
+  nextBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    page +=1;
+    divPostsView.innerHTML = '';
+    createPostsCards('all', divPostsView, page);
+  });
+
+  prevBtn = document.querySelector("#previous-btn")
+  prevBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (page > 1){
+      page -=1;
+      divPostsView.innerHTML = '';
+      createPostsCards('all', divPostsView, page);
+    }
+    
+  });
+
+
+  createPostsCards('all', divPostsView, page);
   
 };
 

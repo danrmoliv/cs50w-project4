@@ -7,6 +7,8 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 
+from django.core.paginator import Paginator
+
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import User, PostItem
@@ -37,10 +39,16 @@ def compose_post(request):
 
     return JsonResponse({"message": "Post sent successfully."}, status=201)
 
+
 def return_posts(request, user_posts):
 
     if user_posts=='all':
         posts = PostItem.objects.all()
+    
+    elif user_posts=='following':
+        usuario_object = User.objects.filter(username=request.user.username)
+        usuarios_following = usuario_object.first().following.all()
+        posts = PostItem.objects.filter(user__in=usuarios_following)
 
     elif len(user_posts) > 0:
         try:
@@ -56,7 +64,12 @@ def return_posts(request, user_posts):
 
     posts = posts.order_by("-timestamp").all()
 
-    return JsonResponse([postitem.serialize() for postitem in posts], safe=False)
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return JsonResponse([postitem.serialize() for postitem in page_obj], safe=False)
+
 
 def return_profile_content(request, user_name):
     

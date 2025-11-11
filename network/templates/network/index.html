@@ -18,18 +18,27 @@
             </div>
         {% endif %}
         <div id="div-all-posts">
-            
+
         </div>
     </div> 
 
-    <div id="following-view">
-        TODO
-    </div>
+    {% if user.is_authenticated %}
+        <div id="following-view">
+
+        </div>
+    {% endif %}
 
     <div id="profile-view">
         <div id="profile-content"></div>
         <h4 style="margin: 15px;">Posts: </h4>
         <div id="profile-posts"></div>
+    </div>
+
+    <div id="pagination-btns">
+        <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="#" id="previous-btn">Previous</a></li>
+            <li class="page-item"><a class="page-link" href="#" id="next-btn">Next</a></li>
+        </ul>
     </div>
 
     

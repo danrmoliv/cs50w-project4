@@ -1,4 +1,4 @@
-h2{
+h2, #pagination-btns{
     margin: 15px;
 }
 
@@ -8,6 +8,8 @@ h2{
     padding: 20px;
     border-radius: 5px;
 }
+
+
 
 #profile-content{
     margin: 15px;
