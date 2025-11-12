@@ -129,8 +129,44 @@ function load_profile_user(username){
       /// TODO: Corrigir bug unfollow na pagina following
     })
   })
-  .then(createPostsCards(username, document.querySelector('#profile-posts')))
+  .then(load_profile_posts(username, document.querySelector('#profile-posts')))
 };
+
+function load_profile_posts(username, elementSelector){
+  let page = 1
+
+  nextBtn = document.querySelector("#next-btn");
+  prevBtn = document.querySelector("#previous-btn");
+
+  prevBtn.style.display='none';
+
+  nextBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    page +=1;
+    elementSelector.innerHTML = '';
+    createPostsCards(username, elementSelector, page)
+    prevBtn.style.display='block';
+  });
+
+  
+  prevBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (page > 1){
+      page -=1;
+      elementSelector.innerHTML = '';
+      createPostsCards(username, elementSelector, page);
+      if (page < 2) {
+        prevBtn.style.display='none';
+      }
+    } else {
+      prevBtn.style.display='none';
+    }
+    
+  });
+  
+  createPostsCards(username, elementSelector, page);
+
+}
 
 function load_following() {
     document.querySelector('#all-posts-view').style.display = 'none';
@@ -139,7 +175,40 @@ function load_following() {
 
     divPostsFollowing = document.querySelector("#following-view");
 
-    const page = 1
+    let page = 1
+
+    nextBtn = document.querySelector("#next-btn");
+    prevBtn = document.querySelector("#previous-btn");
+
+    prevBtn.style.display='none';
+
+    nextBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      page +=1;
+      divPostsFollowing.innerHTML = '';
+      createPostsCards('following', divPostsFollowing, page)
+
+      prevBtn.style.display='block';
+    });
+
+    
+    prevBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      if (page > 1){
+        page -=1;
+        divPostsFollowing.innerHTML = '';
+        createPostsCards('following', divPostsFollowing, page)
+        
+        if (page < 2) {
+          prevBtn.style.display='none';
+        }
+
+      } else {
+        prevBtn.style.display='none';
+      }
+      
+    });
+
 
     // load_profile_user('foo');
     fetch(`/posts/following`)
@@ -205,26 +274,40 @@ function createPostsCards(profile, divPostsView, page=1){
 }
 
 function createAllPostsView() {
+  /// TODO: Contar número de páginas para controlar com base nisso (Continua aumentando o numero de page retornando a mesma coisa)
   divPostsView = document.querySelector("#div-all-posts");
   divPostsView.innerHTML = '';
 
   let page = 1
 
-  nextBtn = document.querySelector("#next-btn")
+  nextBtn = document.querySelector("#next-btn");
+  prevBtn = document.querySelector("#previous-btn");
+  // prevBtn.disabled = true;
+  prevBtn.style.display='none';
+
+
   nextBtn.addEventListener('click', (event) => {
     event.preventDefault();
     page +=1;
+    
     divPostsView.innerHTML = '';
     createPostsCards('all', divPostsView, page);
+    prevBtn.style.display='block';
+    // prevBtn.disabled = false;
   });
-
-  prevBtn = document.querySelector("#previous-btn")
+  
   prevBtn.addEventListener('click', (event) => {
     event.preventDefault();
     if (page > 1){
       page -=1;
       divPostsView.innerHTML = '';
       createPostsCards('all', divPostsView, page);
+      if (page < 2) {
+        prevBtn.style.display='none';
+      }
+    } else {
+      // prevBtn.disabled = true;
+      prevBtn.style.display='none';
     }
     
   });
