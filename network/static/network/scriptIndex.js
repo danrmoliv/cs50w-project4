@@ -175,6 +175,8 @@ function load_following() {
 
     divPostsFollowing = document.querySelector("#following-view");
 
+    divPostsFollowing.innerHTML = ''
+
     let page = 1
 
     nextBtn = document.querySelector("#next-btn");
