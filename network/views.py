@@ -119,15 +119,15 @@ def return_profile_content(request, user_name):
 
         if data.get("follow"):
  
-            usuario.followers.add(usuario_request)
-            #usuario_request.following.add(usuario)
+            #usuario.followers.add(usuario_request)
+            usuario_request.following.add(usuario)
 
             #usuario.save()
             usuario_request.save()   
             
         elif data.get("unfollow"):
  
-            usuario.followers.remove(usuario_request)
+            #usuario.followers.remove(usuario_request)
             usuario_request.following.remove(usuario)
 
             usuario.save()
