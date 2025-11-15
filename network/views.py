@@ -41,6 +41,30 @@ def compose_post(request):
 
 
 def return_posts(request, user_posts):
+    if request.method == "PUT":
+
+        data = json.loads(request.body)
+        usuario_request = User.objects.get(username=data.get("currentUser"))
+
+        post_item = PostItem.objects.get(id=user_posts)
+
+        print(post_item)
+
+        if data.get("like"):
+ 
+            post_item.liked_by.add(usuario_request)
+
+            post_item.save()
+
+        elif data.get("unlike"):
+
+            post_item.liked_by.remove(usuario_request)
+            
+            post_item.save()
+
+        print(data, user_posts, post_item)
+
+        return HttpResponse(status=204)
 
     if user_posts=='all':
         posts = PostItem.objects.all()

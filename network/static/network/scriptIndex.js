@@ -223,10 +223,18 @@ function createPostsCards(profile, divPostsView, page=1){
 
     postItems.forEach(postItem => {
       
+      const postId = postItem.id;
       const body = postItem.body;
       const userWhoPosted = postItem.creator;
       const horario = postItem.timestamp;
-      const qtdLikes = postItem.liked_by.length;
+      let qtdLikes = postItem.liked_by.length;
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+      let fullHeart = false
+
+      if (postItem.liked_by.includes(currentUsername)) {
+        fullHeart = true;
+      };
 
       const elementPost = document.createElement('div');
       elementPost.className = 'post-item';
@@ -258,11 +266,59 @@ function createPostsCards(profile, divPostsView, page=1){
 
       const likesEmojiElement = document.createElement('p');
       // likesEmojiElement.innerHTML = `&#9825; &#9829; ${qtdLikes}`;
-      likesEmojiElement.innerHTML = `<em>&#9825;  </em> ${qtdLikes}`;
+      if (fullHeart) {
+        likesEmojiElement.innerHTML = `<a href="#"><em> &#9829; </em></a> ${qtdLikes}`;
+      } else {
+        likesEmojiElement.innerHTML = `<a href="#"><em>&#9825;  </em></a> ${qtdLikes}`;
+      }
+      
       elementPost.appendChild(likesEmojiElement);
 
-      likesEmojiElement.addEventListener('click', () => {
-        likesEmojiElement.innerHTML = `<em> &#9829; </em> ${qtdLikes+1}`;
+      likesEmojiElement.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        // TODO: Adicionar fetch com PUT e alterar qtd de likes
+
+        if (fullHeart) {
+          qtdLikes = qtdLikes - 1
+          likesEmojiElement.innerHTML = `<a href="#"><em>&#9825;  </em></a> ${qtdLikes}`;
+          fullHeart = false;
+
+          fetch(`/posts/${postId}`, {
+          method: 'PUT',
+          headers: {
+            // Informa ao servidor que você está enviando JSON
+            'Content-Type': 'application/json',
+            // Adiciona o token CSRF ao cabeçalho que o Django espera
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify({
+              unlike: true,
+              currentUser: currentUsername
+          })
+          })
+
+        } else {
+          qtdLikes = qtdLikes + 1
+          likesEmojiElement.innerHTML = `<a href="#"><em> &#9829; </em></a> ${qtdLikes}`;
+          fullHeart = true;
+
+          fetch(`/posts/${postId}`, {
+          method: 'PUT',
+          headers: {
+            // Informa ao servidor que você está enviando JSON
+            'Content-Type': 'application/json',
+            // Adiciona o token CSRF ao cabeçalho que o Django espera
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify({
+              like: true,
+              currentUser: currentUsername
+          })
+          })
+
+        }
+        
       });
       // likesEmojiElement.style.color = 'red'
       // likesEmojiElement.style.fontSize = '32px'
@@ -271,7 +327,8 @@ function createPostsCards(profile, divPostsView, page=1){
       
     })
   })
-}
+};
+
 
 function createAllPostsView() {
   /// TODO: Contar número de páginas para controlar com base nisso (Continua aumentando o numero de page retornando a mesma coisa)
