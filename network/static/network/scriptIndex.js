@@ -47,14 +47,16 @@ function load_profile_user(username){
       const username = usuario.username;
 
       const followers = usuario.followers;
-      const followersQtd = followers.length;
+      let followersQtd = followers.length;
 
       const following = usuario.following;
-      const followingQtd = following.length;
+      let followingQtd = following.length;
 
-      divProfile.innerHTML = `
-        <h3>${username}</h3>
-        <h5>${followersQtd} Followers      ${followingQtd} Following</h5>`
+      divProfile.innerHTML = `<h3>${username}</h3>`
+        
+      let h5FollowData = document.createElement('h5');
+      h5FollowData.innerHTML = `<h5>${followersQtd} Followers      ${followingQtd} Following</h5>`;
+      divProfile.appendChild(h5FollowData);
 
       // console.log(username, followersQtd, followingQtd)
 
@@ -98,11 +100,11 @@ function load_profile_user(username){
             currentUser: currentUsername
         })
         })
-        .then(fetch(`/profiles/${username}`)).then(followButton.style.display = 'none')
-        .then(unfollowButton.style.display = 'block');
-
-            ////// TODO: Corrigir bug na alteração automatica da quantidade de seguidores
-
+        .then(fetch(`/profiles/${username}`))
+        .then(followButton.style.display = 'none')
+        .then(unfollowButton.style.display = 'block')
+        .then(followersQtd = followersQtd+1)
+        .then(h5FollowData.innerHTML = `<h5>${followersQtd} Followers      ${followingQtd} Following</h5>`);
 
       });
 
@@ -123,10 +125,12 @@ function load_profile_user(username){
         })
         })
         .then(fetch(`/profiles/${username}`)).then(unfollowButton.style.display = 'none')
-        .then(followButton.style.display = 'block').then(fetch(`/posts/following`));
+        .then(followButton.style.display = 'block').then(fetch(`/posts/following`))
+        .then(followersQtd = followersQtd-1)
+        .then(h5FollowData.innerHTML = `<h5>${followersQtd} Followers      ${followingQtd} Following</h5>`);
+
       });
 
-      /// TODO: Corrigir bug unfollow na pagina following
     })
   })
   .then(load_profile_posts(username, document.querySelector('#profile-posts')))
