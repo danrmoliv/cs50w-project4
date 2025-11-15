@@ -49,7 +49,7 @@ function load_profile_user(username){
       const followers = usuario.followers;
       const followersQtd = followers.length;
 
-      const following = usuario.followers;
+      const following = usuario.following;
       const followingQtd = following.length;
 
       divProfile.innerHTML = `
@@ -218,29 +218,7 @@ function load_following() {
 
 };
 
-function createPostsCards(profile, divPostsView, page=1){
-  fetch(`/posts/${profile}?page=${page}`)
-  .then(response => response.json())
-  .then(postItems => {
-
-    postItems.forEach(postItem => {
-      
-      const postId = postItem.id;
-      const body = postItem.body;
-      const userWhoPosted = postItem.creator;
-      const horario = postItem.timestamp;
-      let qtdLikes = postItem.liked_by.length;
-      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-      let fullHeart = false
-
-      if (postItem.liked_by.includes(currentUsername)) {
-        fullHeart = true;
-      };
-
-      const elementPost = document.createElement('div');
-      elementPost.className = 'post-item';
-      elementPost.id = `post-id-${postItem.id}`;
+function createDivCard(elementPost, postId, body, qtdLikes, userWhoPosted, horario, csrfToken, fullHeart) {
 
       const titlePostElement = document.createElement('h4');
       titlePostElement.innerHTML = `<a href="#">${userWhoPosted}</a>`;
@@ -250,9 +228,10 @@ function createPostsCards(profile, divPostsView, page=1){
         load_profile_user(userWhoPosted);
       });
 
+      // Edit Section
       if (currentUsername === userWhoPosted) {
         const editAnchorElement = document.createElement('p');
-      // editAnchorElement.href
+
         editAnchorElement.innerHTML = "<a href='#'>Edit</a>";
         editAnchorElement.style.fontSize = '14px';
         elementPost.appendChild(editAnchorElement);        
@@ -289,15 +268,14 @@ function createPostsCards(profile, divPostsView, page=1){
                       bodyEdit: bodyEdit,
                       currentUser: currentUsername
                   })
-                  })
+                  }).then(createDivCard(elementPost, postId, bodyEdit, qtdLikes, userWhoPosted, horario, csrfToken, fullHeart))
+                  .then(document.querySelector('#edit-post').style.display = 'none')
 
               }
             )
 
         })
-      }
-     
-
+      };
 
       const bodyPostElement = document.createElement('p');
       bodyPostElement.textContent = body;
@@ -309,20 +287,20 @@ function createPostsCards(profile, divPostsView, page=1){
       tsPostElement.style.fontSize = '14px';
       elementPost.appendChild(tsPostElement);
 
+      
       const likesEmojiElement = document.createElement('p');
       // likesEmojiElement.innerHTML = `&#9825; &#9829; ${qtdLikes}`;
       if (fullHeart) {
         likesEmojiElement.innerHTML = `<a href="#"><em> &#9829; </em></a> ${qtdLikes}`;
       } else {
         likesEmojiElement.innerHTML = `<a href="#"><em>&#9825;  </em></a> ${qtdLikes}`;
-      }
+      };
+
       
       elementPost.appendChild(likesEmojiElement);
 
       likesEmojiElement.addEventListener('click', (event) => {
         event.preventDefault();
-
-        // TODO: Adicionar fetch com PUT e alterar qtd de likes
 
         if (fullHeart) {
           qtdLikes = qtdLikes - 1
@@ -365,14 +343,48 @@ function createPostsCards(profile, divPostsView, page=1){
         }
         
       });
-      // likesEmojiElement.style.color = 'red'
-      // likesEmojiElement.style.fontSize = '32px'
-      
+
+      return elementPost
+
+}
+
+
+
+function createPostsCards(profile, divPostsView, page=1){
+  
+  fetch(`/posts/${profile}?page=${page}`)
+  .then(response => response.json())
+  .then(postItems => {
+
+    postItems.forEach(postItem => {
+
+      let body = postItem.body;
+      let qtdLikes = postItem.liked_by.length;
+
+      const postId = postItem.id;      
+      const userWhoPosted = postItem.creator;
+      const horario = postItem.timestamp;      
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+      let fullHeart = false
+
+      if (postItem.liked_by.includes(currentUsername)) {
+        fullHeart = true;
+      };
+
+      let elementPost = document.createElement('div');
+      elementPost.className = 'post-item';
+      elementPost.id = `post-id-${postItem.id}`;
+
+      elementPost = createDivCard(elementPost, postId, body, qtdLikes, userWhoPosted, horario, csrfToken, fullHeart);
+       
       divPostsView.appendChild(elementPost);      
       
     })
   })
 };
+
+
 
 
 function createAllPostsView() {

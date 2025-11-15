@@ -110,6 +110,7 @@ def return_profile_content(request, user_name):
             return JsonResponse([usuario.serialize() for usuario in usuarios], safe=False)
         except:
             return JsonResponse({"error": "Invalid User."}, status=400)
+        
     elif request.method == "PUT":
         data = json.loads(request.body)
 
@@ -119,9 +120,9 @@ def return_profile_content(request, user_name):
         if data.get("follow"):
  
             usuario.followers.add(usuario_request)
-            usuario_request.following.add(usuario)
+            #usuario_request.following.add(usuario)
 
-            usuario.save()
+            #usuario.save()
             usuario_request.save()   
             
         elif data.get("unfollow"):
