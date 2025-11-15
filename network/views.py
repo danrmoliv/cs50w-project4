@@ -53,14 +53,21 @@ def return_posts(request, user_posts):
         if data.get("like"):
  
             post_item.liked_by.add(usuario_request)
-
             post_item.save()
 
         elif data.get("unlike"):
 
             post_item.liked_by.remove(usuario_request)
-            
             post_item.save()
+
+        elif data.get("edit"):
+            if usuario_request == post_item.user:
+                post_item.body = data.get('bodyEdit')
+                post_item.save()
+
+                return HttpResponse(status=204)
+            else:
+                return HttpResponse(status=403)
 
         print(data, user_posts, post_item)
 

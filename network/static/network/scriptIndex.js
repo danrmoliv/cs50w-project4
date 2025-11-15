@@ -250,11 +250,54 @@ function createPostsCards(profile, divPostsView, page=1){
         load_profile_user(userWhoPosted);
       });
 
-      // const editAnchorElement = document.createElement('p');
-      // // editAnchorElement.href
-      // editAnchorElement.innerHTML = "<a>Edit</a>";
-      // editAnchorElement.style.fontSize = '14px';
-      // elementPost.appendChild(editAnchorElement);
+      if (currentUsername === userWhoPosted) {
+        const editAnchorElement = document.createElement('p');
+      // editAnchorElement.href
+        editAnchorElement.innerHTML = "<a href='#'>Edit</a>";
+        editAnchorElement.style.fontSize = '14px';
+        elementPost.appendChild(editAnchorElement);        
+
+        editAnchorElement.addEventListener('click', (event) => {
+          event.preventDefault()
+          const formEditElement = document.createElement('form');
+          formEditElement.id = 'edit-post';
+
+          formEditElement.innerHTML = `
+              <textarea class="form-control" id="edit-body" placeholder="${body}">${body}</textarea>
+              <input type="submit" value="Save" class="btn btn-primary"/>
+          `
+          elementPost.innerHTML = '';
+          elementPost.appendChild(formEditElement);  
+          
+          formEditElement.addEventListener("submit", (event) => { 
+                event.preventDefault();
+
+                const bodyEdit = document.querySelector('#edit-body').value;
+
+                console.log(bodyEdit)
+
+                fetch(`/posts/${postId}`, {
+                  method: 'PUT',
+                  headers: {
+                    // Informa ao servidor que você está enviando JSON
+                    'Content-Type': 'application/json',
+                    // Adiciona o token CSRF ao cabeçalho que o Django espera
+                    'X-CSRFToken': csrfToken
+                  },
+                  body: JSON.stringify({
+                      edit: true,
+                      bodyEdit: bodyEdit,
+                      currentUser: currentUsername
+                  })
+                  })
+
+              }
+            )
+
+        })
+      }
+     
+
 
       const bodyPostElement = document.createElement('p');
       bodyPostElement.textContent = body;
