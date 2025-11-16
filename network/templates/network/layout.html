@@ -49,8 +49,8 @@
 
     {% block script %}
         <script> 
-            const currentUsername = "{{ request.user.username }}"; 
-            console.log(currentUsername);
+            let currentUsername = "{{ request.user.username }}"; 
+
         </script>
         <script src="{% static 'network/scriptIndex.js' %}"></script>
     {% endblock %}

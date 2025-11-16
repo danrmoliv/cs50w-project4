@@ -148,7 +148,7 @@ function load_profile_posts(username, elementSelector){
     event.preventDefault();
     page +=1;
     elementSelector.innerHTML = '';
-
+    createPostsCards(username, elementSelector, page);
     prevBtn.style.display='block';
   });
 
@@ -188,12 +188,13 @@ function load_following() {
     prevBtn = document.querySelector("#previous-btn");
 
     prevBtn.style.display='none';
+    nextBtn.style.display='block';
 
     nextBtn.addEventListener('click', (event) => {
       event.preventDefault();
       page +=1;
       divPostsFollowing.innerHTML = '';
-
+      createPostsCards('following', divPostsFollowing, page);
       prevBtn.style.display='block';
     });
 
