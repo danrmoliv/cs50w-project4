@@ -143,6 +143,7 @@ function load_profile_posts(username, elementSelector){
   prevBtn = document.querySelector("#previous-btn");
 
   prevBtn.style.display='none';
+  nextBtn.style.display='block';
 
   nextBtn.addEventListener('click', (event) => {
     event.preventDefault();
