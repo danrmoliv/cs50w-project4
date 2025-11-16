@@ -148,13 +148,14 @@ function load_profile_posts(username, elementSelector){
     event.preventDefault();
     page +=1;
     elementSelector.innerHTML = '';
-    createPostsCards(username, elementSelector, page)
+
     prevBtn.style.display='block';
   });
 
   
   prevBtn.addEventListener('click', (event) => {
     event.preventDefault();
+    nextBtn.style.display='block';
     if (page > 1){
       page -=1;
       elementSelector.innerHTML = '';
@@ -192,7 +193,6 @@ function load_following() {
       event.preventDefault();
       page +=1;
       divPostsFollowing.innerHTML = '';
-      createPostsCards('following', divPostsFollowing, page)
 
       prevBtn.style.display='block';
     });
@@ -200,6 +200,7 @@ function load_following() {
     
     prevBtn.addEventListener('click', (event) => {
       event.preventDefault();
+      nextBtn.style.display='block';
       if (page > 1){
         page -=1;
         divPostsFollowing.innerHTML = '';
@@ -359,6 +360,14 @@ function createPostsCards(profile, divPostsView, page=1){
   fetch(`/posts/${profile}?page=${page}`)
   .then(response => response.json())
   .then(postItems => {
+    
+    const nextBtn = document.querySelector("#next-btn");
+
+    let pagesReturn = postItems.length
+
+    if (pagesReturn < 10) {
+      nextBtn.style.display='none';
+    };
 
     postItems.forEach(postItem => {
 
@@ -382,10 +391,12 @@ function createPostsCards(profile, divPostsView, page=1){
 
       elementPost = createDivCard(elementPost, postId, body, qtdLikes, userWhoPosted, horario, csrfToken, fullHeart);
        
-      divPostsView.appendChild(elementPost);      
-      
+      divPostsView.appendChild(elementPost);    
+
     })
   })
+
+  
 };
 
 
@@ -410,12 +421,15 @@ function createAllPostsView() {
     
     divPostsView.innerHTML = '';
     createPostsCards('all', divPostsView, page);
+
     prevBtn.style.display='block';
+
     // prevBtn.disabled = false;
   });
   
   prevBtn.addEventListener('click', (event) => {
     event.preventDefault();
+    nextBtn.style.display='block';
     if (page > 1){
       page -=1;
       divPostsView.innerHTML = '';
